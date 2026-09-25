@@ -1,7 +1,7 @@
 Write-Host "=== PROSES PELEPASAN AMAN (SAFE EJECT) UBUNTU SSD ===" -ForegroundColor Yellow
 
 Write-Host "`n1. Menyinkronkan penulisan file (sync) dan unmount sistem di WSL..." -ForegroundColor Cyan
-wsl sh -c "sync; umount /mnt/host/wsl/PHYSICALDRIVE*/* 2>/dev/null; umount /mnt/host/wsl/PHYSICALDRIVE* 2>/dev/null; sync" 2>$null
+wsl sh -c "sync; umount /mnt/host/wsl/PHYSICALDRIVE*p4/etc/resolv.conf 2>/dev/null; umount /mnt/host/wsl/PHYSICALDRIVE*/* 2>/dev/null; umount /mnt/host/wsl/PHYSICALDRIVE* 2>/dev/null; sync" 2>$null
 
 Write-Host "2. Mematikan kuncian hardware passthrough WSL..." -ForegroundColor Cyan
 wsl --shutdown

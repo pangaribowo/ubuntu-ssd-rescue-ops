@@ -22,9 +22,10 @@ mountpoint -q "$ROOT/dev"     || mount --bind /dev "$ROOT/dev"
 mountpoint -q "$ROOT/dev/pts" || mount --bind /dev/pts "$ROOT/dev/pts"
 mountpoint -q "$ROOT/run"     || mount --bind /run "$ROOT/run"
 
-# Ensure DNS resolution works inside chroot
+# Ensure DNS resolution works inside chroot via temporary bind-mount
+# (DO NOT use cp, to preserve the native Ubuntu systemd-resolved symlink on disk)
 if [ -f /etc/resolv.conf ]; then
-    cp -L /etc/resolv.conf "$ROOT/etc/resolv.conf" 2>/dev/null
+    mountpoint -q "$ROOT/etc/resolv.conf" || mount --bind /etc/resolv.conf "$ROOT/etc/resolv.conf" 2>/dev/null
 fi
 
 # Set terminal type for color and Oh My Posh support

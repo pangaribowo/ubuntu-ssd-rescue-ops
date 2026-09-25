@@ -22,6 +22,9 @@ mountpoint -q "$ROOT/sys"     || mount -t sysfs sys "$ROOT/sys"
 mountpoint -q "$ROOT/dev"     || mount --bind /dev "$ROOT/dev"
 mountpoint -q "$ROOT/dev/pts" || mount --bind /dev/pts "$ROOT/dev/pts"
 mountpoint -q "$ROOT/run"     || mount --bind /run "$ROOT/run"
+if [ -f /etc/resolv.conf ]; then
+    mountpoint -q "$ROOT/etc/resolv.conf" || mount --bind /etc/resolv.conf "$ROOT/etc/resolv.conf" 2>/dev/null
+fi
 
 # Ensure sshd runtime directory exists
 mkdir -p "$ROOT/run/sshd"
