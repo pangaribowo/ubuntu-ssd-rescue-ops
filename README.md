@@ -41,8 +41,7 @@ This toolkit provides a **complete operational bridge** between a Windows host a
 | **Disk Used** | 80.3 GB (81%) | 53.4 GB (54%) | **−26.9 GB** | 🟢 Optimal |
 | **Disk Free** | 18.4 GB | 45.3 GB | **+26.9 GB** | 🟢 +147% |
 | **Cloud Backup Objects** | 0 | 2,945 files (1.135 GiB) | **+2,945** | 🟢 Complete |
-| **GitHub Repos Synced** | 3 (partial) | 11 (100% up-to-date) | **+8 repos** | 🟢 Complete |
-| **Private Repos Created** | 0 | 3 new private repos | **+3** | 🟢 Secured |
+| **Code Repositories Synced** | Uncommitted/Local | 100% synchronized | **Full redundancy** | 🟢 Complete |
 | **Terminal Access from Windows** | None (reboot required) | Instant (< 2s launch) | **∞ improvement** | 🟢 Operational |
 | **SSH Access from Windows** | None | Port 2222 (localhost) | **New capability** | 🟢 Active |
 | **fstab Errors** | 2 critical | 0 | **−2** | 🟢 Fixed |
@@ -74,7 +73,7 @@ graph TD
     end
 
     subgraph "Remote Services"
-        J["GitHub (pangaribowo) — 11 private repos"]
+        J["GitHub Remote Repositories"]
         K["Google Drive — 2,945 objects backup"]
     end
 
@@ -161,24 +160,6 @@ ssh -p 2222 bakung@127.0.0.1
 # Inside the Ubuntu terminal:
 sh /deep_cleanup.sh
 ```
-
----
-
-## Repositories Secured
-
-| Repository | Visibility | GitHub URL |
-|:---|:---:|:---|
-| `warungzura` | 🔒 Private | `github.com/pangaribowo/warungzura` |
-| `tmux-mcp` | 🔒 Private | `github.com/pangaribowo/tmux-mcp` |
-| `kaggle2` | 🔒 Private | `github.com/pangaribowo/kaggle2` |
-| `kpu-election-system` | 🌐 Public | `github.com/pangaribowo/kpu-election-system` |
-| `dotfiles` | 🌐 Public | `github.com/pangaribowo/dotfiles` |
-| `private-infra` | 🔒 Private | `github.com/pangaribowo/private-infra` |
-| `tu-api` | 🏢 Org | `github.com/GMF-Utility-Training/tu-api` |
-| `gse-api` | 🏢 Org | `github.com/GMF-GSE-Training/gse-api` |
-| `gse-client` | 🏢 Org | `github.com/gmf-gse-training/gse-client` |
-| `amz_store` | 🌐 Public | `github.com/AnosVoldigoad247/amz_store` |
-| `claude-desktop-debian` | 🌐 Public | `github.com/aaddrick/claude-desktop-debian` |
 
 ---
 
