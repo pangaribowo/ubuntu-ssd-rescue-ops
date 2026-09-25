@@ -112,8 +112,9 @@ ubuntu-ssd-rescue-ops/
 └── launchers/
     ├── 1-Pasang-Ubuntu-SSD.bat        # 1-click dynamic mount & terminal launch
     ├── 2-Cabut-Ubuntu-SSD-Aman.bat    # 1-click safe eject (sync + release locks)
-    ├── Buka-Ubuntu-Terminal.bat        # Interactive terminal launcher
-    └── Mulai-SSH-Server-PuTTY.bat      # 1-click SSH server for PuTTY
+    └── remote-ssh/                    # Advanced & Remote access shortcuts
+        ├── Buka-Ubuntu-Terminal.bat   # Interactive terminal launcher
+        └── Mulai-SSH-Server-PuTTY.bat # 1-click SSH server for PuTTY
 ```
 
 ---
