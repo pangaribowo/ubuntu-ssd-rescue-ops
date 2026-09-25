@@ -102,13 +102,17 @@ ubuntu-ssd-rescue-ops/
 ├── scripts/
 │   ├── enter_ubuntu.sh                # Chroot entry with auto-mount pseudo-fs
 │   ├── start_sshd.sh                  # SSH server bridge (port 2222)
-│   └── deep_cleanup.sh                # Automated disk cleanup (categorized)
+│   ├── deep_cleanup.sh                # Automated disk cleanup (categorized)
+│   ├── mount_ssd.ps1                  # Dynamic SSD detection, auto-mount & launch
+│   └── eject_ssd.ps1                  # Safe unmount, buffer sync & lock release
 ├── configs/
 │   ├── sysctl-ssd-optimized.conf      # I/O tuning for DRAM-less SSD
 │   ├── journald-capped.conf           # Journal log size cap (100 MB)
 │   └── nosuspend-usb.conf             # Prevent suspend corruption on USB SSD
 └── launchers/
-    ├── Buka-Ubuntu-Terminal.bat        # 1-click terminal launcher (Windows)
+    ├── 1-Pasang-Ubuntu-SSD.bat        # 1-click dynamic mount & terminal launch
+    ├── 2-Cabut-Ubuntu-SSD-Aman.bat    # 1-click safe eject (sync + release locks)
+    ├── Buka-Ubuntu-Terminal.bat        # Interactive terminal launcher
     └── Mulai-SSH-Server-PuTTY.bat      # 1-click SSH server for PuTTY
 ```
 
@@ -120,30 +124,27 @@ ubuntu-ssd-rescue-ops/
 
 - Windows 10/11 with **WSL2** enabled
 - External SSD with Ubuntu installation (ext4 partition)
-- GitHub CLI (`gh`) authenticated
-- `rclone` configured with Google Drive remote
 
-### Step 1: Mount the SSD
+### Option A: 1-Click Desktop Workflow (Zero Commands)
+
+1. **Plug in SSD** via USB.
+2. Double-click `1-Pasang-Ubuntu-SSD.bat` → Automatically detects disk number, mounts partition to WSL2, and launches interactive Zsh terminal.
+3. When finished, double-click `2-Cabut-Ubuntu-SSD-Aman.bat` → Flushes buffers (`sync`), unmounts filesystems, terminates WSL lock, and safely releases the drive.
+
+### Option B: Manual CLI Workflow
 
 ```powershell
-# Find the disk number (look for your SSD model)
+# 1. Mount the SSD
 wsl --mount \\.\PHYSICALDRIVE1 --partition 4
 
-# Verify
-wsl df -h /mnt/host/wsl/PHYSICALDRIVE1p4
-```
-
-### Step 2: Enter Ubuntu Terminal
-
-```powershell
-# Option A: Direct (works from PowerShell, Git Bash, CMD, Windows Terminal)
+# 2. Enter Ubuntu terminal
 wsl -u root /mnt/host/wsl/PHYSICALDRIVE1p4/enter.sh
 
-# Option B: Double-click the launcher on Desktop
-# → Buka-Ubuntu-Terminal.bat
+# 3. Safe unmount when disconnecting
+powershell -File scripts/eject_ssd.ps1
 ```
 
-### Step 3: SSH Access via PuTTY (Optional)
+### SSH Access via PuTTY (Optional)
 
 ```powershell
 # Start SSH server (run once, keep window open)
@@ -152,13 +153,6 @@ wsl -u root /mnt/host/wsl/PHYSICALDRIVE1p4/start_sshd.sh
 # Connect via PuTTY: Host=127.0.0.1, Port=2222, User=bakung
 # Or via command line:
 ssh -p 2222 bakung@127.0.0.1
-```
-
-### Step 4: Run Disk Cleanup (if needed)
-
-```bash
-# Inside the Ubuntu terminal:
-sh /deep_cleanup.sh
 ```
 
 ---
