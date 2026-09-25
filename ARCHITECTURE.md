@@ -300,3 +300,41 @@ rclone sync operations explicitly exclude regenerable artifacts:
 | **Native dual-boot** | O(1) reboot | Full native | Complete | Native |
 
 The chroot approach provides the **optimal trade-off** for this use case: minimal setup complexity with full userspace access, at the cost of shared kernel (which is acceptable since both environments trust the same operator).
+
+---
+
+## 9. DNS Architecture: Dual-Boot Isolation vs Chroot Nameservers
+
+### 9.1 The Split-Environment DNS Problem
+
+A dual-boot root filesystem requires two completely mutually exclusive DNS configurations depending on its runtime context:
+
+1. **In Bare-Metal Boot:** The OS uses `systemd-resolved` with a local caching stub listener on `127.0.0.53:53`, dynamically updating upstream nameservers based on DHCP leases from the active Wi-Fi/Ethernet interface.
+2. **In WSL2 Chroot:** `systemd-resolved` is not running. The chroot environment must resolve queries via WSL2's internal Hyper-V NAT gateway (e.g., `172.28.128.1:53` or the host's VPN DNS).
+
+### 9.2 The VFS Inode Masking Solution
+
+To prevent cross-environment configuration corruption, the chroot entry script uses Linux Virtual File System (VFS) mount namespace overlaying:
+
+```
+ext4 Disk Surface (Persistent Storage):
+  inode 1835009: /etc/resolv.conf -> ../run/systemd/resolve/stub-resolv.conf [SYMLINK]
+       │
+       ▼ (During Bare-Metal Boot)
+  glibc reads /etc/resolv.conf → resolves to 127.0.0.53:53 → systemd-resolved OK
+
+       │
+       ▼ (During WSL2 Chroot Session)
+  mount --bind /etc/resolv.conf /mnt/host/wsl/PHYSICALDRIVE1p4/etc/resolv.conf
+       │
+       ▼ (VFS Memory Layer)
+  VFS dentry masked with WSL2 host's active resolv.conf (172.28.128.1)
+  underlying ext4 inode remains 100% UNTOUCHED
+       │
+       ▼ (During Safe Eject / Teardown)
+  umount /mnt/host/wsl/PHYSICALDRIVE1p4/etc/resolv.conf
+  ext4 symlink instantly re-exposed for next bare-metal boot
+```
+
+This pattern ensures zero disk state pollution and guarantees that native Wi-Fi DNS works immediately upon rebooting into Linux.
+

@@ -151,6 +151,17 @@ All local engineering repositories were audited and synchronized:
 
 **Result:** 63.0 GB → 53.4 GB used (−9.6 GB)
 
+### Phase 7: Bare-Metal Post-Boot Triage — Resolving Chroot DNS Pollution
+
+Following the recovery operation, the operator booted directly into bare-metal Ubuntu. While the 802.11 Wi-Fi interface connected and acquired a DHCP address, all domain resolution failed.
+
+**Root Cause:** The initial chroot initialization copied WSL2's `/etc/resolv.conf`, replacing the canonical `systemd-resolved` symbolic link (`../run/systemd/resolve/stub-resolv.conf`) with a static file pointing to WSL's virtual Hyper-V nameserver (`172.28.128.1`). In bare-metal boot, this IP was unroutable, causing all DNS requests to time out.
+
+**Mitigation Executed:**
+1. Restored canonical symbolic link: `/etc/resolv.conf -> ../run/systemd/resolve/stub-resolv.conf`.
+2. Refactored `enter_ubuntu.sh` and `start_sshd.sh` to use non-destructive transient bind-mounts (`mount --bind /etc/resolv.conf $ROOT/etc/resolv.conf`).
+3. Documented dual-boot ACPI D3 hardware power management mitigations (Windows Fast Startup).
+
 ---
 
 ## 4. Final Verdict & Outcomes
@@ -165,13 +176,14 @@ All local engineering repositories were audited and synchronized:
 | **Git Sync** | Uncommitted/Local | 100% synchronized | **Full coverage** |
 | **Remote Access** | None | 2 methods (chroot + SSH) | **New capability** |
 | **Config Vulnerabilities** | 5 critical | 0 | **All resolved** |
+| **Bare-Metal DNS Health** | Broken (WSL IP leak) | 100% Operational | **Symlink Restored** |
 
 ### Qualitative Outcomes
 
 1. **Data Safety:** Every unique file on the SSD now exists in at least 2 locations (SSD + GitHub or SSD + Google Drive).
 2. **Operational Agility:** The operator can now manage their Ubuntu environment without rebooting, from any Windows terminal.
 3. **SSD Longevity:** I/O optimizations (commit interval, swappiness, disabled tracker3) significantly reduce write amplification on the DRAM-less ADATA SU650.
-4. **Reproducibility:** All scripts and configurations are version-controlled in this repository for future recovery scenarios.
+4. **Reproducibility:** All scripts, launchers, and architectural runbooks are version-controlled in this repository.
 
 ---
 
@@ -181,3 +193,5 @@ All local engineering repositories were audited and synchronized:
 2. **WSL2 physical disk passthrough is production-viable** — The `wsl --mount` + `chroot` pattern provides near-native Linux access to external disks without dual-booting, making it a legitimate ops tool.
 3. **AI development tools are silent storage hogs** — Codeium (2.1 GB), Windsurf (1.9 GB), and Cursor caches can silently consume gigabytes. Regular cleanup of `~/.codeium`, `~/.windsurf`, and `.windsurf/` directories is essential on constrained storage.
 4. **`node_modules/` proliferation is the #1 disk space enemy** — Across 14+ project directories, `node_modules/` consumed over 10 GB. Using `pnpm` with its content-addressable store or running periodic `npx npkill` is recommended.
+5. **Never overwrite symlinks on guest filesystems during chroot** — Naively copying `/etc/resolv.conf` into a chroot target replaces the `systemd-resolved` symlink with host-specific internal nameservers. Always use temporary `mount --bind` to preserve guest OS on-disk configuration for bare-metal boots.
+

@@ -99,6 +99,10 @@ ubuntu-ssd-rescue-ops/
 ├── CASE_STUDY.md                      # Full incident triage & execution log
 ├── ARCHITECTURE.md                    # Low-level internals & kernel mechanics
 ├── LICENSE                            # MIT License
+├── docs/                              # Deep-dive engineering guides
+│   ├── DNS_RESOLVER_TRIAGE.md         # Post-mortem: Chroot DNS pollution & systemd-resolved
+│   ├── DUAL_BOOT_HARDWARE_COLLISIONS.md # Windows Fast Startup & ACPI D3 Wi-Fi lockups
+│   └── STORAGE_LIFECYCLE_GUIDE.md     # Dynamic enumeration, locking, and safe eject
 ├── scripts/
 │   ├── enter_ubuntu.sh                # Chroot entry with auto-mount pseudo-fs
 │   ├── start_sshd.sh                  # SSH server bridge (port 2222)
@@ -116,6 +120,18 @@ ubuntu-ssd-rescue-ops/
         ├── Buka-Ubuntu-Terminal.bat   # Interactive terminal launcher
         └── Mulai-SSH-Server-PuTTY.bat # 1-click SSH server for PuTTY
 ```
+
+---
+
+## 📚 Deep-Dive Technical Guides
+
+Comprehensive architectural documentation is available in the [`docs/`](docs/) directory:
+
+| Document | Focus & Scope |
+|:---|:---|
+| [**`docs/DNS_RESOLVER_TRIAGE.md`**](docs/DNS_RESOLVER_TRIAGE.md) | **DNS Pollution Post-Mortem:** Resolving the issue where bare-metal Ubuntu has Wi-Fi connected but fails name resolution due to WSL2 nameserver leaks in `/etc/resolv.conf`. Covers `systemd-resolved` and the non-destructive bind-mount pattern. |
+| [**`docs/DUAL_BOOT_HARDWARE_COLLISIONS.md`**](docs/DUAL_BOOT_HARDWARE_COLLISIONS.md) | **Cross-OS Power State Collisions:** Analysis of Windows Fast Startup (Hybrid Shutdown) leaving PCIe Wi-Fi NICs in ACPI D3 states, causing Linux firmware upload failures. Includes PowerShell mitigation. |
+| [**`docs/STORAGE_LIFECYCLE_GUIDE.md`**](docs/STORAGE_LIFECYCLE_GUIDE.md) | **Storage Lifecycle & Safe Eject:** Deep dive into dynamic PhysicalDrive indexing, Hyper-V raw block handle locks, the multi-stage unmount pipeline, and cache synchronization barriers. |
 
 ---
 
